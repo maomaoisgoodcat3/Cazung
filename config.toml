@@ -1,0 +1,96 @@
+# ===========================================================
+#  Cazung - cấu hình chính. Sửa xong thì khởi động lại Cazung.
+# ===========================================================
+
+[server]
+host = "127.0.0.1"          # chỉ nghe trên máy local, đừng đổi thành 0.0.0.0
+port = 8765
+
+[llm]
+# provider: "ollama" (khuyên dùng) hoặc "openai" (LM Studio, llama.cpp server,
+# vLLM, KoboldCpp... bất cứ server nào có API tương thích OpenAI)
+provider = "ollama"
+base_url = "http://127.0.0.1:11434"
+model = "dolphin3"           # ollama pull dolphin3  (hoặc dolphin-mistral, dolphin-llama3, dolphin-mixtral...)
+api_key = ""
+temperature = 0.8
+num_ctx = 8192               # cửa sổ ngữ cảnh gửi cho model (token)
+max_response_tokens = 1024
+repeat_penalty = 1.1         # tăng lên 1.15-1.2 nếu model hay bị lặp chữ
+# Chế độ suy nghĩ cho model có hỗ trợ (qwen3, deepseek-r1, ...): luồng suy nghĩ hiện ra mượt trong khung chat.
+# Model không hỗ trợ thì tự tắt. Model trả về <think>...</think> trong nội dung thì luôn được tách riêng.
+think = false
+think_max_tokens = 2048
+keep_alive = "30m"
+# Model phụ cho việc nền (tóm tắt, trích xuất ký ức, tự học). Để trống = dùng model chính.
+# Dùng model nhỏ (vd "qwen2.5:3b") sẽ nhanh hơn nhưng tóm tắt kém hơn.
+utility_model = ""
+
+[embedding]
+# provider: "ollama", "openai" hoặc "hash" (không cần model, chỉ so khớp từ khóa)
+# Nếu model embedding không có, Cazung tự chuyển sang "hash" và tự nâng cấp lại khi có.
+provider = "ollama"
+base_url = ""                # trống = dùng base_url của [llm]
+model = "nomic-embed-text"   # ollama pull nomic-embed-text
+api_key = ""
+
+[persona]
+name = "Cazung"
+user_title = "chủ nhân"      # Cazung gọi bạn là gì
+self_pronoun = "em"          # Cazung xưng là gì
+language = "Vietnamese"
+# Thêm mô tả tính cách / luật riêng (tiếng Anh hoặc Việt đều được)
+extra = ""
+
+[memory]
+recent_keep_messages = 8     # số tin nhắn gần nhất luôn giữ nguyên văn
+compact_trigger = 0.75       # lịch sử chiếm >75% ngân sách thì nén lại thành tóm tắt
+summary_max_words = 450      # độ dài tối đa của bản tóm tắt cuộn
+core_max_items = 25          # số ký ức cốt lõi về bạn luôn được đưa vào prompt
+recall_top_k = 6             # số ký ức liên quan được truy hồi mỗi lượt
+recall_min_score = 0.35      # ngưỡng liên quan (embedding thật); hash dùng ngưỡng thấp hơn tự động
+history_snippets = 3         # số trích đoạn hội thoại cũ (tìm theo từ khóa) đưa vào prompt
+reflect_every_turns = 10     # cứ N lượt thì Cazung tự suy ngẫm rút kinh nghiệm
+dedupe_threshold = 0.9       # độ giống nhau để gộp ký ức trùng
+
+[agent]
+max_steps = 10               # số lần gọi tool tối đa trong 1 lượt
+confirm_dangerous = true     # hỏi bạn trước mọi thao tác có tác động: shell, python, gửi mail, ghi file ngoài workspace, tool MCP
+tool_timeout = 90
+workspace = "data/workspace" # thư mục làm việc của Cazung
+enable_shell = true
+enable_python = true
+
+[email]
+# Để Cazung đọc/gửi mail. Gmail: bật xác minh 2 bước rồi tạo "App Password" và dán vào password.
+# Gửi mail luôn hiện bản xem trước để bạn bấm Cho phép.
+enabled = false
+smtp_host = "smtp.gmail.com"
+smtp_port = 587
+imap_host = "imap.gmail.com"
+imap_port = 993
+username = ""                # vd ban@gmail.com
+password = ""
+from_name = ""
+
+# ---- Kết nối tool ngoài qua MCP (Model Context Protocol) ----
+# Mỗi khối [[mcp]] là một server; tool của nó hiện ra với tên "<name>__<tool>".
+# Mặc định mọi tool MCP đều phải xin phép; auto_approve chỉ nên chứa tool chỉ-đọc.
+# [[mcp]]
+# name = "github"
+# command = "npx"
+# args = ["-y", "@modelcontextprotocol/server-github"]
+# env = { GITHUB_PERSONAL_ACCESS_TOKEN = "ghp_..." }
+# confirm = true
+# auto_approve = ["search_repositories", "get_file_contents"]
+#
+# [[mcp]]
+# name = "fs"
+# command = "npx"
+# args = ["-y", "@modelcontextprotocol/server-filesystem", "D:/Projects"]
+
+[pet]
+scale = 4                    # độ phóng to sprite pixel (3-5)
+wander = true                # tự đi dạo trên taskbar
+idle_chatter = true          # thỉnh thoảng tự nói vu vơ
+sleep_after_minutes = 5      # không ai chơi thì đi ngủ

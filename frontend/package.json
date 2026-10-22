@@ -1,0 +1,13 @@
+{
+  "name": "cazung-desktop",
+  "version": "1.0.0",
+  "description": "Cazung - chibi pixel desktop pet AI agent",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "node launch.js"
+  },
+  "devDependencies": {
+    "electron": "^44.7.0"
+  }
+}
